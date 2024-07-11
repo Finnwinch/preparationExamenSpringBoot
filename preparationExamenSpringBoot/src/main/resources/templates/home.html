@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Homme page</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/style/home.css}">
+</head>
+<body>
+    <header>
+        <nav>
+            <a id="who" th:text="'Bonjour ' + ${utilisateur.nom} + ', ' + ${utilisateur.prenom}" th:href="@{/utilisateur/deconnexion}"></a>
+            <a th:href="@{/utilisater/addPage}">Ajouter Compte</a>
+            <a th:href="@{/utilisater/removePage}">Supprimer Compte</a>
+            <a th:href="@{/utilisater/updatePage}">Modifier Compte</a>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <article>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Email</th>
+                        <th>Roles</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="utilisateur : ${utilisateurs}">
+                        <td>
+                            <img th:src="@{'/image/' + ${utilisateur.image}}" th:alt="${utilisateur.image}" th:type="'image/png'" height="50px" width="50px"/>
+                        </td>
+                        <td th:text="${utilisateur.nom}"></td>
+                        <td th:text="${utilisateur.prenom}"></td>
+                        <td th:text="${utilisateur.email}"></td>
+                        <td id="role">
+                            <ul th:each="role : ${utilisateur.roles}">
+                                <li th:text="${role.name}"></li>
+                            </ul>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </article>
+        </section>
+    </main>
+    <footer></footer>
+</body>
+</html>

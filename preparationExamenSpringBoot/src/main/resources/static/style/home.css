@@ -1,0 +1,30 @@
+header {
+    height: 45px;
+    &>nav {
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #343A40;
+        color: #F8F9FA;
+        &>#who {
+            margin-right: auto;
+            padding-left: 15px;
+        }
+        &>a {
+            padding: 15px;
+            text-decoration: none;
+            color: #F8F9FA;
+            &:hover {
+                padding: 14px;
+                background-color: #0D6EFD;
+            }
+        }
+    }
+}
+#role {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}

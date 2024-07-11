@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion des utilisateurs</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/style/Form.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Style pour le conteneur du formulaire */
+        #updateUserSection {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* Style pour les titres */
+        h2 {
+            margin-top: 0;
+            font-size: 24px;
+        }
+
+        /* Style pour les étiquettes des champs */
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        /* Style pour les champs de texte */
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+
+        /* Style pour les boutons */
+        button[type="submit"] {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        /* Style pour les cases à cocher */
+        .roles label {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        /* Style pour le message de confirmation */
+        #CurrentProfil {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+    </style>
+    <script>
+        $(document).ready(function() {
+            $('#utilisateurSelect').change(function() {
+                var userId = $(this).val();
+                $.ajax({
+                    url: '/utilisateur/' + userId,
+                    type: 'POST',
+                    success: function(utilisateur) {
+                        $('input[name="username"]').val(utilisateur.nom);
+                        $('input[name="password"]').val(utilisateur.password);
+                        $('input[name="validePassword"]').val(utilisateur.password);
+                        $('input[name="Courriel"]').val(utilisateur.email);
+                        $('#CurrentProfil').html(utilisateur.image) ;
+                        $('input[name="Administrateur"]').prop('checked', false);
+                        $('input[name="Utilisateur"]').prop('checked', false);
+                        $('input[name="Visiteur"]').prop('checked', false);
+                        for (let i = 0; i < utilisateur.roles.length; i++) {
+                            if (utilisateur.roles[i].name == "Administrateur") {
+                                $('input[name="Administrateur"]').prop('checked', true);
+                            } else if (utilisateur.roles[i].name == "Utilisateur") {
+                                $('input[name="Utilisateur"]').prop('checked', true);
+                            } else if (utilisateur.roles[i].name == "Visiteur") {
+                                $('input[name="Visiteur"]').prop('checked', true);
+                            }
+                        }
+                    },
+                    error: function() {
+                        console.log('Erreur lors de la récupération des détails de l\'utilisateur');
+                    }
+                });
+            });
+        });
+
+    </script>
+</head>
+<body>
+<header>
+    <h1>Gestion des utilisateurs</h1>
+</header>
+<main>
+    <p th:if="${utilisateur != null}" th:text="${utilisateur.email}"></p>
+    <a th:href="@{/home}">Retour home</a>
+    <section th:if="${operation == 'add'}" id="Add">
+        <h2>Ajouter un utilisateur</h2>
+        <form th:action="@{/utilisater/add}" method="post" enctype="multipart/form-data">
+            <label for="username">Username</label>
+            <input type="text" name="username">
+            <label for="password">Mot de passe</label>
+            <input type="password" name="password">
+            <label for="validePassword">Confirmation Mot de passe</label>
+            <input type="password" name="validePassword">
+            <label for="Courriel">Courriel</label>
+            <input type="email" name="Courriel">
+            <label for="profil">Photo de profil</label>
+            <input type="file" name="profil">
+            <div id="roles">
+                <label for="roles">Roles : </label>
+                <input type="checkbox" name="Administrateur" value="Administrateur">
+                <label for="Administrateur">Administrateur</label>
+                <input type="checkbox" name="Utilisateur" value="Utilisateur">
+                <label for="Utilisateur">Utilisateur</label>
+                <input type="checkbox" name="Visiteur" value="Visiteur">
+                <label for="Visiteur">Visiteur</label>
+            </div>
+            <button type="submit">Enregistrer</button>
+        </form>
+    </section>
+    <section th:if="${operation == 'remove'}">
+        <h2>Supprimer un utilisateur</h2>
+        <form th:action="@{/utilisateur/remove}" method="post" enctype="multipart/form-data">
+            <label for="Utilisateurs">Choose Utilisateur to remove</label>
+            <select name="utilisateur">
+                <option th:each="utilisateur : ${utilisateurs}" th:value="${utilisateur.id}">
+                    [ID: <span th:text="${utilisateur.id}"></span>]
+                    <span th:text="${utilisateur.nom}"></span>,
+                    <span th:text="${utilisateur.prenom}"></span>
+                </option>
+            </select>
+            <br><br>
+            <input type="submit" value="Submit">
+        </form>
+    </section>
+    <section id="updateUserSection" th:if="${operation == 'update'}">
+        <h2>Mettre à jour un utilisateur</h2>
+        <select id="utilisateurSelect" name="utilisateur">
+            <option th:each="utilisateur : ${utilisateurs}" th:value="${utilisateur.id}">
+                [ID: <span th:text="${utilisateur.id}"></span>]
+                <span th:text="${utilisateur.nom}"></span>,
+                <span th:text="${utilisateur.prenom}"></span>
+            </option>
+        </select>
+        <article id="utilisateurDetails">
+            <form th:if="Updateutilisateur != null" th:action="@{/utilisater/update}" method="post" enctype="multipart/form-data">
+                <label for="username">Username</label>
+                <input type="text" name="username">
+                <label for="password">Mot de passe</label>
+                <input type="password" name="password">
+                <label for="validePassword">Confirmation Mot de passe</label>
+                <input type="password" name="validePassword">
+                <label for="Courriel">Courriel</label>
+                <input type="email" name="Courriel">
+                <label for="profil">Photo de profil</label>
+                <span id="CurrentProfil">test</span>
+                <input type="file" name="profil">
+                <div class="roles">
+                    <label for="roles">Roles : </label>
+                    <input type="checkbox" name="Administrateur" value="Administrateur">
+                    <label for="Administrateur">Administrateur</label>
+                    <input type="checkbox" name="Utilisateur" value="Utilisateur">
+                    <label for="Utilisateur">Utilisateur</label>
+                    <input type="checkbox" name="Visiteur" value="Visiteur">
+                    <label for="Visiteur">Visiteur</label>
+                </div>
+                <button type="submit">Mettre à jour</button>
+            </form>
+        </article>
+    </section>
+</main>
+<footer></footer>
+</body>
+</html>
